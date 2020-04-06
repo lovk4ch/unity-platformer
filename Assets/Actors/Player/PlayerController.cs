@@ -14,7 +14,7 @@ public class PlayerController : PhysicsSpriteController
     private float xSpeed;
 
     private Vector3 boundsSize;
-    private float rotationSpeed;
+    private float angularVelocity;
 
     [SerializeField]
     private float jetPower;
@@ -47,7 +47,7 @@ public class PlayerController : PhysicsSpriteController
 
         Gimbal.Instance.SetTarget(this);
         boundsSize = renderer.bounds.size;
-        rotationSpeed = Mathf.PI * boundsSize.x * xSpeed;
+        angularVelocity = xSpeed * 360 / (Mathf.PI * 2 * boundsSize.x);
     }
 
     private void OnDestroy()
@@ -102,18 +102,16 @@ public class PlayerController : PhysicsSpriteController
 
     private void Update()
     {
-        float dt = Time.deltaTime;
-        float dv = dt * Gravity;
-
-        float dx = dt * xSpeed;
+        float dv = Time.deltaTime * Gravity;
+        float dx = Time.deltaTime * xSpeed;
 
         ySpeed -= dv;
-        float dy = dt * ySpeed;
+        float dy = Time.deltaTime * ySpeed;
 
         if (CheckCollisions(ref dy))
             Stop();
 
-        transform.Rotate(0, 0, -rotationSpeed, Space.Self);
+        transform.Rotate(0, 0, -angularVelocity * Time.deltaTime, Space.Self);
         transform.Translate(Vector3.right * dx + Vector3.up * dy, Space.World);
 
         if (transform.position.y < -30)
